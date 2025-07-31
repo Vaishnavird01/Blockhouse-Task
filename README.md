@@ -11,12 +11,14 @@ g_t(X) = (1 / X) * Σ_{i=1..k} [ (p_i - m_t) * q_i ]
 
 For sells, use (m_t - p_i) instead. This exactly matches Figures 1–4 in the assignment prompt.
 
-Toy Example (with bid side in table too)
-| Level	| Ask Price pᵢ | Ask Size qᵢ |	Bid Price pᵢ |	Bid Size qᵢ|
-:-------::-------------::------------::--------------::------------:
-|1	    | $10.00	     | 50 shares	 |$9.95	         |75 shares    |
-|2	    | $10.05	     | 75 shares	 |$9.90	         |50 shares    |
-|3	    |$10.10	       |100 shares	 |$9.85	         |100 shares   |
+### Toy Example (with bid side in table too)
+
+| Level | Ask Price pᵢ | Ask Size qᵢ | Bid Price pᵢ | Bid Size qᵢ |
+|-------|--------------|-------------|--------------|-------------|
+| 1     | $10.00       | 50 shares   | $9.95        | 75 shares   |
+| 2     | $10.05       | 75 shares   | $9.90        | 50 shares   |
+| 3     | $10.10       | 100 shares  | $9.85        | 100 shares  |
+
 
 Mid‐price = (10.00 + 9.95)/2 = 9.975
 gₜ(100) = (50·0.025 + 50·0.075) / 100 = $0.05/share
