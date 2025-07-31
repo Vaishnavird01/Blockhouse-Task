@@ -1,5 +1,27 @@
 # Blockhouse Task 2: Quantifying Slippage & Designing an Execution Algorithm
 
+## Introduction & Slippage Mechanics  
+In modern electronic markets, trading runs on a **limit‐order book** (LOB). Participants submit **limit orders** at specified prices, which rest in the book, and **market orders** that execute immediately against the best resting liquidity. A 10‐level LOB snapshot (MBP-10) captures the top ten bid and ask prices and sizes at time *t*.  
+
+When you send a market order of **X** shares, it “eats” through these levels, causing your average execution price to deviate from the mid‐quote. We define the mid‐price:
+m_t = (bid_{t,0} + ask_{t,0}) / 2    # unit: quote‐currency per share
+
+and the temporary impact (per‐share slippage) for a buy is:
+g_t(X) = (1 / X) * Σ_{i=1..k} [ (p_i - m_t) * q_i ]
+
+For sells, use (m_t - p_i) instead. This exactly matches Figures 1–4 in the assignment prompt.
+
+Toy Example (with bid side in table too)
+| Level	| Ask Price pᵢ | Ask Size qᵢ |	Bid Price pᵢ |	Bid Size qᵢ|
+:-------::-------------::------------::--------------::------------:
+|1	    | $10.00	     | 50 shares	 |$9.95	         |75 shares    |
+|2	    | $10.05	     | 75 shares	 |$9.90	         |50 shares    |
+|3	    |$10.10	       |100 shares	 |$9.85	         |100 shares   |
+
+Mid‐price = (10.00 + 9.95)/2 = 9.975
+gₜ(100) = (50·0.025 + 50·0.075) / 100 = $0.05/share
+gₜ(200) would also clear 50@10.10, raising the average.
+
 ## Overview
 
 This repository demonstrates how to:
