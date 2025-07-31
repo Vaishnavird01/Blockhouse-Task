@@ -27,9 +27,7 @@ This repository demonstrates how to:
 - Unzip and load each CSV into pandas.  
 - Drop any rows missing best bid/ask.  
 - Compute the mid-price at each snapshot as  
-  \[
-    m_t = \tfrac12\bigl(\text{bid}_{0} + \text{ask}_{0}\bigr).
-  \]
+  m_t = (bid_t,0 + ask_t,0) / 2
 
 ---
 
@@ -42,10 +40,7 @@ When a market order of size \(X\) shares arrives at time \(t\), it “walks” t
 
 The **temporary impact** measures the average per-share price concession:
 
-\[
-  g_t(X)
-  = \frac{1}{X}\sum_{i=1}^k \bigl(p_i - m_t\bigr)\,q_i,
-\]
+g_t(X) = (1 / X) * sum_{i=1..k} [ (p_i - m_t) * q_i ]
 
 where \(m_t\) is the mid-price.  This definition captures exactly how slippage grows as larger blocks interact with thinner liquidity at deeper levels.
 
@@ -70,27 +65,23 @@ The bid side might mirror \$9.95/75, \$9.90/50, …, giving a mid-price of \$9.9
 ### Candidate Models
 
 1. **Linear model:**  
-   \[
-     g_t(X)\approx \beta_t\,X.
-   \]  
+   g_t(X) ≈ beta_t * X
    - **When to use:** If book depth is relatively uniform.  
    - **Why:** Simplest form; yields a linear cost function amenable to fast convex solvers.  
    - **Limitation:** Understates impact for large \(X\) that traverse deeper, thinner levels.
 
 2. **Power-law model:**  
-   \[
-     g_t(X)=\alpha_t\,X^{\beta_t},\quad 0<\beta_t<1.
-   \]  
+   g_t(X) = alpha_t * X^beta_t    (0 < beta_t < 1)
    - **When to use:** For larger trades where slippage accelerates.  
    - **Why:** Captures concave growth—initial shares clear thick levels cheaply, later shares pay more.  
    - **Limitation:** Requires nonlinear fitting and solver support for convex power functions.
 
 ### Fitting Procedure
 
-- Evaluate \(\{(X,g_t(X))\}\) on a grid \(X\in\{100,200,\dots,1000\}\).  
-- **Linear fit:** Ordinary least squares through the origin → \(\beta_t\).  
-- **Power-law fit:** Nonlinear least squares → \((\alpha_t,\beta_t)\).  
-- Compare goodness-of-fit (\(R^2\)) for both models.
+- Evaluate (X, g_t(X)) on a grid X = 100, 200, …, 1000.  
+- **Linear fit:** Ordinary least squares through the origin → beta_t.  
+- **Power-law fit:** Nonlinear least squares → (alpha_t, beta_t).  
+- Compare goodness-of-fit R^2 for both models.
 
 ### Summary of Results
 
@@ -113,27 +104,24 @@ The bid side might mirror \$9.95/75, \$9.90/50, …, giving a mid-price of \$9.9
 
 ### Mathematical Formulation
 
-Given total target \(S\) and \(N\) decision times \(t_1,\dots,t_N\), allocate \(\{x_i\}\) to minimize total impact:
+Given total target \(S\) and \(N\) decision times t_1,…,t_N:, allocate \(\{x_i\}\) to minimize total impact:
 
-\[
-  \min_{x_i\ge0}\; \sum_{i=1}^N g_{t_i}(x_i)
-  \quad\text{s.t.}\quad
-  \sum_{i=1}^N x_i = S.
-\]
+minimize   sum_{i=1..N} g_{t_i}(x_i)
+subject to sum_{i=1..N} x_i = S,   x_i >= 0
 
 ### Linear-Cost Special Case
 
-- **Cost:** \(g_{t_i}(x)=\beta_i x\).  
-- **Solution:** Allocate all \(S\) to the period with minimum \(\beta_i\).  
+- **Cost:** g_{t_i}(x) = beta_i * x.  
+- **Solution:** Allocate all \(S\) to the period with minimum beta_i.  
 - **Why this matters:** Illustrates how uniform execution can be suboptimal if liquidity varies.
 
 ### Power-Law Generalization
 
-- **Cost:** \(g_{t_i}(x)=\alpha_i x^{\beta_i}\) (convex for \(\beta_i\ge1\)).  
+- **Cost:** g_{t_i}(x) = alpha_i * x^{beta_i} (convex for beta_i).  
 - **Lagrangian:**  
-  \(\mathcal{L} = \sum_i \alpha_i x_i^{\beta_i} - \lambda(\sum_i x_i - S)\).  
+  L(x, λ) = sum_i alpha_i * x_i^{beta_i}  - λ*(sum_i x_i - S).  
 - **First-order condition:**  
-  \(\alpha_i \beta_i x_i^{\beta_i-1} = \lambda\;\forall i\).  
+  alpha_i * beta_i * x_i^{beta_i - 1} = λ   for all i  
 - **Interpretation:**  
   Water-filling: allocate more to periods with lower marginal cost.
 
