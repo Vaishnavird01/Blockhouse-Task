@@ -21,7 +21,9 @@ For sells, use (m_t - p_i) instead. This exactly matches Figures 1–4 in the as
 
 
 Mid‐price = (10.00 + 9.95)/2 = 9.975
+
 gₜ(100) = (50·0.025 + 50·0.075) / 100 = $0.05/share
+
 gₜ(200) would also clear 50@10.10, raising the average.
 
 ## Overview
